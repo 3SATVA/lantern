@@ -71,8 +71,8 @@ export function makeEnemy(rt: Runtime, kind: Enemy["kind"], x: number, y: number
   };
 }
 
-function occupied(rt: Runtime, x: number, y: number): boolean {
-  if (Math.hypot(rt.player.x - x, rt.player.y - y) < 240) return true;
+function occupied(rt: Runtime, x: number, y: number, minDist = 280): boolean {
+  if (Math.hypot(rt.player.x - x, rt.player.y - y) < minDist) return true;
   const tx = Math.floor(x / TILE);
   const ty = Math.floor(y / TILE);
   const tile = tileAt(rt.world, tx, ty);
@@ -88,7 +88,7 @@ export function trySpawn(rt: Runtime, forced?: EnemyKind): boolean {
   const rng = mulberry32((Math.random() * 1e9) | 0);
   for (let i = 0; i < 12; i++) {
     const ang = rng() * Math.PI * 2;
-    const dist = 260 + rng() * 320;
+    const dist = 340 + rng() * 420;
     const x = rt.player.x + Math.cos(ang) * dist;
     const y = rt.player.y + Math.sin(ang) * dist;
     if (x < 32 || y < 32 || x > rt.world.w * TILE - 32 || y > rt.world.h * TILE - 32) continue;
@@ -110,7 +110,7 @@ export function seedEnemies(rt: Runtime, count: number): void {
     const ty = irand(rng, 3, rt.world.h - 4);
     const x = tx * TILE + 8;
     const y = ty * TILE + 8;
-    if (occupied(rt, x, y)) continue;
+    if (occupied(rt, x, y, 760)) continue;
     const kind = KINDS[irand(rng, 0, KINDS.length - 1)];
     rt.enemies.push(makeEnemy(rt, kind, x, y));
     made++;
@@ -152,9 +152,16 @@ export function updateEnemies(rt: Runtime, dt: number): void {
     e.anim += dt;
     e.touchCd = Math.max(0, e.touchCd - dt);
     e.attackCd = Math.max(0, e.attackCd - dt);
-    e.stun = Math.max(0, e.stun - dt);
+    if (e.stun > 0) e.stun = Math.max(0, e.stun - dt);
     const dist = Math.hypot(p.x - e.x, p.y - e.y);
-    if (e.stun <= 0) {
+    const wander = e.kind !== "pod" && e.kind !== "clone" && dist > 400;
+    if (wander) {
+      if (Math.hypot(e.vx, e.vy) < 8) {
+        const a = e.anim * 1.3 + e.id;
+        e.vx = Math.cos(a) * e.speed * 0.35;
+        e.vy = Math.sin(a) * e.speed * 0.35;
+      }
+    } else if (e.stun <= 0) {
       if (e.kind === "basic" || e.kind === "pod") {
         chase(e, p.x, p.y, e.speed);
       } else if (e.kind === "tank") {
@@ -235,4 +242,4 @@ export function updateEnemies(rt: Runtime, dt: number): void {
   rt.enemies = rt.enemies.filter((e) => !e.dead);
 }
 
-export const SPAWN_CAP = 24;
+export const SPAWN_CAP = 18;

@@ -131,6 +131,15 @@ function drawWorld(ctx: CanvasRenderingContext2D, rt: Runtime): void {
   }
   ctx.globalAlpha = 1;
   drawLantern(ctx, rt.player, pal, rt.time, rt.player.cooldowns[rt.spells[rt.player.spell]] > 0.02, rt.player.hurt > 0);
+  if (rt.guard > 0) {
+    ctx.globalAlpha = 0.45 + Math.sin(rt.time * 8) * 0.2;
+    ctx.strokeStyle = pal.glow;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(rt.player.x, rt.player.y, 18, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  }
   for (const f of rt.floaters) drawText(ctx, f.text, f.x, f.y, f.color, 1, "center");
   if (rt.bossLock) {
     const a = rt.world.arena;
@@ -144,45 +153,58 @@ function drawPointer(ctx: CanvasRenderingContext2D, rt: Runtime): void {
   const z = rt.zoom;
   const sx = (rt.objective.x - rt.camera.x) * z;
   const sy = (rt.objective.y - rt.camera.y) * z;
-  const pal = rt.world.def.palette;
-  const pad = 36;
-  const on = sx > pad && sy > pad && sx < rt.viewW - pad && sy < rt.viewH - pad;
-  ctx.fillStyle = pal.glow;
+  const pad = 48;
+  const on = sx > pad && sy > 80 && sx < rt.viewW - pad && sy < rt.viewH - 70;
+  const tag = rt.objective.tag || "CORE";
   if (on) {
-    const bob = Math.sin(rt.time * 6) * 5;
-    ctx.fillRect(sx - 2, sy - 34 + bob, 4, 4);
-    ctx.fillRect(sx - 6, sy - 28 + bob, 12, 4);
-    ctx.fillRect(sx - 4, sy - 24 + bob, 8, 4);
+    const bob = Math.sin(rt.time * 6) * 6;
+    ctx.fillStyle = "#1a100c";
+    ctx.fillRect(sx - 18, sy - 46 + bob, 36, 16);
+    ctx.fillStyle = "#ffe566";
+    ctx.fillRect(sx - 3, sy - 42 + bob, 6, 6);
+    ctx.fillRect(sx - 8, sy - 34 + bob, 16, 5);
+    ctx.fillRect(sx - 5, sy - 28 + bob, 10, 5);
+    drawText(ctx, tag, sx, sy - 44 + bob, "#ffe566", 1, "center");
     return;
   }
   const ang = Math.atan2(sy - rt.viewH / 2, sx - rt.viewW / 2);
-  const ex = rt.viewW / 2 + Math.cos(ang) * (rt.viewW / 2 - 28);
-  const ey = rt.viewH / 2 + Math.sin(ang) * (rt.viewH / 2 - 28);
+  const ex = Math.max(70, Math.min(rt.viewW - 70, rt.viewW / 2 + Math.cos(ang) * (rt.viewW / 2 - 64)));
+  const ey = Math.max(90, Math.min(rt.viewH - 80, rt.viewH / 2 + Math.sin(ang) * (rt.viewH / 2 - 64)));
+  ctx.fillStyle = "rgba(12,8,10,0.85)";
+  ctx.fillRect(ex - 28, ey - 18, 56, 36);
+  ctx.fillStyle = "#ffe566";
+  ctx.fillRect(ex - 26, ey - 16, 52, 2);
   ctx.save();
-  ctx.translate(ex, ey);
+  ctx.translate(ex, ey - 2);
   ctx.rotate(ang);
-  ctx.fillRect(0, -3, 14, 6);
-  ctx.fillRect(10, -7, 6, 4);
-  ctx.fillRect(10, 3, 6, 4);
+  ctx.fillStyle = "#ffe566";
+  ctx.fillRect(0, -4, 16, 8);
+  ctx.fillRect(12, -8, 6, 4);
+  ctx.fillRect(12, 4, 6, 4);
   ctx.restore();
+  drawText(ctx, tag, ex, ey + 8, "#ffe566", 1, "center");
 }
 
 function drawHud(ctx: CanvasRenderingContext2D, rt: Runtime): void {
   const pal = rt.world.def.palette;
   const p = rt.player;
-  panel(ctx, 12, 12, 210, 62, "rgba(12,8,10,0.82)", pal.accent);
-  bar(ctx, 22, 20, 140, 10, p.hp / p.maxHp, "#ff5d73", "#3a1c24");
-  drawText(ctx, `${Math.ceil(p.hp)}`, 168, 18, "#ffd0d8", 1);
-  bar(ctx, 22, 36, 140, 8, p.mana / p.maxMana, "#7ecbff", "#142838");
-  drawText(ctx, `${rt.gold} G`, 22, 50, "#ffd166", 1);
+  panel(ctx, 12, 12, 280, 92, "rgba(12,8,10,0.88)", pal.accent);
+  drawText(ctx, "HP", 24, 22, "#ff8fa3", 2);
+  bar(ctx, 64, 24, 150, 14, p.hp / p.maxHp, "#ff5d73", "#3a1c24");
+  drawText(ctx, `${Math.ceil(p.hp)}`, 224, 22, "#ffd0d8", 2);
+  drawText(ctx, "MP", 24, 46, "#9ad7ff", 2);
+  bar(ctx, 64, 48, 150, 14, p.mana / p.maxMana, "#5ec8ff", "#102433");
+  drawText(ctx, `${Math.ceil(p.mana)}`, 224, 46, "#d7f3ff", 2);
   const spell = SPELLS[rt.spells[p.spell]];
-  drawText(ctx, spell.name, 78, 50, "#fff4d8", 1);
+  drawText(ctx, `${rt.gold} G`, 24, 74, "#ffd166", 2);
+  drawText(ctx, spell.name, 110, 74, "#fff6e4", 2);
 
-  panel(ctx, 12, 82, 230, rt.objective.side ? 62 : 48, "rgba(12,8,10,0.78)", "#6b5344");
-  drawText(ctx, "QUEST", 22, 90, pal.accent, 1);
-  drawText(ctx, rt.objective.title, 22, 104, "#fff6e4", 1);
-  drawText(ctx, rt.objective.detail, 22, 116, "#d9cbb8", 1);
-  if (rt.objective.side) drawText(ctx, rt.objective.side, 22, 128, "#e7c27a", 1);
+  const questH = rt.objective.side ? 96 : 74;
+  panel(ctx, 12, 112, 340, questH, "rgba(12,8,10,0.88)", "#6b5344");
+  drawText(ctx, "QUEST", 24, 122, pal.accent, 2);
+  drawText(ctx, rt.objective.title, 24, 146, "#fff6e4", 2);
+  drawText(ctx, rt.objective.detail, 24, 168, "#d9cbb8", 2);
+  if (rt.objective.side) drawText(ctx, rt.objective.side, 24, 190, "#e7c27a", 2);
 
   ensureMinimap(rt);
   const mw = 128;
@@ -197,10 +219,16 @@ function drawHud(ctx: CanvasRenderingContext2D, rt: Runtime): void {
     ctx.fillStyle = color;
     ctx.fillRect(dx - s / 2, dy - s / 2, s, s);
   };
-  dot(rt.world.shopX, rt.world.shopY, "#ffd166", 3);
+  dot(rt.world.shopX, rt.world.shopY, "#ffd166", 4);
+  dot(rt.objective.x, rt.objective.y, "#ffe566", 5);
   dot(rt.world.coreX, rt.world.coreY, rt.world.restored ? pal.glow : "#ffffff", 4);
-  dot(p.x, p.y, "#fff", 3);
-  drawText(ctx, rt.world.def.name, mx + mw / 2, my + mh + 6, pal.scarf, 1, "center");
+  dot(p.x, p.y, "#fff", 4);
+  ctx.strokeStyle = "#ffe566";
+  ctx.beginPath();
+  ctx.moveTo(mx + (p.x / (rt.world.w * TILE)) * mw, my + (p.y / (rt.world.h * TILE)) * mh);
+  ctx.lineTo(mx + (rt.objective.x / (rt.world.w * TILE)) * mw, my + (rt.objective.y / (rt.world.h * TILE)) * mh);
+  ctx.stroke();
+  drawText(ctx, rt.world.def.name, mx + mw / 2, my + mh + 8, pal.scarf, 2, "center");
 
   const order = ["bolt", "whip", "nova", "mote", "lance"] as const;
   const slot = 36;

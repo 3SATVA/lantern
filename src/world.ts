@@ -127,8 +127,8 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
     tiles.set(next);
   }
 
-  const spawnTx = 8;
-  const spawnTy = MAP_H - 8;
+  const spawnTx = 24;
+  const spawnTy = MAP_H - 24;
   const arenaW = 26;
   const arenaH = 20;
   const arenaX = MAP_W - arenaW - 4;
@@ -151,7 +151,7 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
   for (let i = 0; i < waypoints.length - 1; i++) {
     carveLine(tiles, waypoints[i][0], waypoints[i][1], waypoints[i + 1][0], waypoints[i + 1][1], 2);
   }
-  setDisk(tiles, spawnTx, spawnTy, 5, Tile.Floor);
+  setDisk(tiles, spawnTx, spawnTy, 8, Tile.Floor);
   setDisk(tiles, shopTx, shopTy, 4, Tile.Floor);
 
   for (let y = arenaY; y < arenaY + arenaH; y++) {
@@ -182,7 +182,7 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
     }
     if (!clear) continue;
     const nearPath = Math.hypot(x - shopTx, y - shopTy) < 8;
-    const nearSpawn = Math.hypot(x - spawnTx, y - spawnTy) < 10;
+    const nearSpawn = Math.hypot(x - spawnTx, y - spawnTy) < 14;
     const nearArena = x > arenaX - 3 && y < arenaY + arenaH + 3;
     if (nearPath || nearSpawn || nearArena) continue;
     const rad = irand(rng, 2, 3);

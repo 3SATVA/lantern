@@ -23,7 +23,7 @@ Light a core and the next rift opens. Light all four and the shatter slows.
 | --- | --- | --- |
 | Move | WASD or arrow keys | Left-side joystick |
 | Aim | Mouse | Right-side drag |
-| Cast | Hold left mouse | Hold the right side |
+| Cast | Hold left mouse or Space | Hold the right side |
 | Spells | `1`–`5` or scroll | SPL button |
 | Interact | `E` or Enter | E button |
 | Pause | Esc or `P` | II button |

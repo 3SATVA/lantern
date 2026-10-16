@@ -51,7 +51,8 @@ export interface Runtime {
   nearName: string;
   hazardCd: number;
   met: boolean[];
-  objective: { x: number; y: number; title: string; detail: string; side: string };
+  objective: { x: number; y: number; title: string; detail: string; side: string; tag: string };
+  guard: number;
   minimap: HTMLCanvasElement | null;
   input: Input;
   audio: AudioBus;
@@ -131,6 +132,8 @@ export function enterDimension(rt: Runtime, index: number, x?: number, y?: numbe
   const prevHp = rt.player?.hp;
   rt.player = makePlayer(px, py, rt.upgrades, heal ? undefined : prevHp);
   rt.player.hp = Math.max(1, Math.min(rt.player.hp, rt.player.maxHp));
+  rt.guard = 2;
+  rt.spawnTimer = 2.4;
   rt.banner = { text: rt.world.def.name, sub: rt.world.def.epithet, life: 2.8 };
   rt.minimap = null;
   rt.camera.x = px - rt.viewW / (2 * rt.zoom);
@@ -175,7 +178,8 @@ export function freshRuntime(input: Input, audio: AudioBus): Runtime {
     nearName: "",
     hazardCd: 0,
     met: [false, false, false, false],
-    objective: { x: 0, y: 0, title: "", detail: "", side: "" },
+    objective: { x: 0, y: 0, title: "", detail: "", side: "", tag: "CORE" },
+    guard: 0,
     minimap: null,
     input,
     audio,

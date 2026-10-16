@@ -58,7 +58,7 @@ export function damageEnemy(rt: Runtime, e: Enemy, amount: number, kx = 0, ky = 
 
 export function damagePlayer(rt: Runtime, amount: number, cause: string): void {
   const p = rt.player;
-  if (p.hurt > 0 || rt.mode !== "play") return;
+  if (p.hurt > 0 || rt.guard > 0 || rt.mode !== "play") return;
   p.hp -= amount;
   p.hurt = 0.7;
   rt.shake = Math.min(9, 2 + amount * 0.25);

@@ -49,7 +49,7 @@ function applyLoaded(rt: Runtime, data: SaveData): void {
   enterDimension(rt, data.dim ?? 0, data.x, data.y, false);
   rt.player.hp = Math.max(1, Math.min(data.hp ?? rt.player.maxHp, rt.player.maxHp));
   rt.player.mana = rt.player.maxMana;
-  seedEnemies(rt, 16);
+  seedEnemies(rt, 12);
   rt.mode = "play";
 }
 
@@ -66,7 +66,7 @@ function newGame(rt: Runtime): void {
   rt.seenIntro = false;
   rt.introPage = 0;
   enterDimension(rt, 0, undefined, undefined, true);
-  seedEnemies(rt, 16);
+  seedEnemies(rt, 12);
   rt.mode = "intro";
 }
 
@@ -74,11 +74,11 @@ function refreshObjective(rt: Runtime): void {
   const w = rt.world;
   const boss = rt.enemies.find((e) => e.kind === "boss");
   if (rt.bossLock && boss) {
-    rt.objective = { x: boss.x, y: boss.y, title: `Defeat ${boss.name}`, detail: "The arena is sealed", side: "" };
+    rt.objective = { x: boss.x, y: boss.y, title: `Defeat ${boss.name}`, detail: "The arena is sealed", side: "", tag: "BOSS" };
     return;
   }
   if (rt.wardens[rt.dim] && !rt.restored[rt.dim]) {
-    rt.objective = { x: w.coreX, y: w.coreY, title: "Restore the core", detail: "Press E beside the core", side: "" };
+    rt.objective = { x: w.coreX, y: w.coreY, title: "Restore the core", detail: "Press E beside the core", side: "", tag: "CORE" };
     return;
   }
   if (!rt.restored[rt.dim]) {
@@ -86,19 +86,20 @@ function refreshObjective(rt: Runtime): void {
     rt.objective = {
       x: w.coreX,
       y: w.coreY,
-      title: "Reach the shattered core",
+      title: "Find the core",
       detail: `${paces} paces`,
-      side: rt.met[rt.dim] ? "" : `${w.def.merchant} sells light nearby`,
+      side: rt.met[rt.dim] ? "" : "Merchant on the road",
+      tag: "CORE",
     };
     return;
   }
   if (rt.restored.every(Boolean)) {
-    rt.objective = { x: w.coreX, y: w.coreY, title: "Every core burns", detail: "Wander, or rest", side: "" };
+    rt.objective = { x: w.coreX, y: w.coreY, title: "Every core burns", detail: "Wander, or rest", side: "", tag: "CORE" };
     return;
   }
   const next = rt.restored.findIndex((lit) => !lit);
   const name = next >= 0 ? DIMENSIONS[next].name : "home";
-  rt.objective = { x: w.coreX, y: w.coreY, title: `Rift toward ${name}`, detail: "Press E at the core", side: "" };
+  rt.objective = { x: w.coreX, y: w.coreY, title: `Rift toward ${name}`, detail: "Press E at the core", side: "", tag: "RIFT" };
 }
 
 function tryInteract(rt: Runtime): void {
@@ -212,6 +213,7 @@ function updatePlay(rt: Runtime, dt: number): void {
   for (const key of ORDER) p.cooldowns[key] = Math.max(0, p.cooldowns[key] - dt);
   p.mana = Math.min(p.maxMana, p.mana + 16 * dt);
   p.hurt = Math.max(0, p.hurt - dt);
+  rt.guard = Math.max(0, rt.guard - dt);
   p.slow = Math.max(0, p.slow - dt);
   if (p.poison > 0) {
     p.poison -= dt;
@@ -227,7 +229,8 @@ function updatePlay(rt: Runtime, dt: number): void {
     rt.whip.life -= dt;
     if (rt.whip.life <= 0) rt.whip = null;
   }
-  if (input.pointerDown && !overButton && rt.mode === "play") {
+  const casting = (input.pointerDown && !overButton) || input.keys.has(" ");
+  if (casting && rt.mode === "play") {
     const id = rt.spells[p.spell];
     if (p.cooldowns[id] <= 0 && p.mana < SPELLS[id].mana) {
       if (input.castPressed) rt.audio.sfx("deny");
@@ -273,9 +276,10 @@ function updatePlay(rt: Runtime, dt: number): void {
   if (!rt.bossLock) {
     rt.spawnTimer -= dt;
     const alive = rt.enemies.length;
-    if (alive < SPAWN_CAP && rt.spawnTimer <= 0) {
-      if (trySpawn(rt)) rt.spawnTimer = 0.55;
-      else rt.spawnTimer = 0.2;
+    const nearby = rt.enemies.filter((e) => Math.hypot(e.x - p.x, e.y - p.y) < 760).length;
+    if (alive < SPAWN_CAP && nearby < 10 && rt.spawnTimer <= 0) {
+      if (trySpawn(rt)) rt.spawnTimer = 1.1;
+      else rt.spawnTimer = 0.35;
     }
   }
 
@@ -374,7 +378,7 @@ function updateTravel(rt: Runtime): void {
     return;
   }
   enterDimension(rt, index, undefined, undefined, false);
-  seedEnemies(rt, 16);
+  seedEnemies(rt, 12);
   rt.panel = "none";
   persist(rt);
 }
@@ -455,14 +459,14 @@ export function createGame(input: Input, audio: AudioBus) {
         const rect = hit(deadButtons(rt), click.x, click.y);
         if (rect?.id === "retry") {
           enterDimension(rt, rt.dim, undefined, undefined, true);
-          seedEnemies(rt, 16);
+          seedEnemies(rt, 12);
           rt.mode = "play";
         }
         if (rect?.id === "title") rt.mode = "title";
       }
       if (input.interact) {
         enterDimension(rt, rt.dim, undefined, undefined, true);
-        seedEnemies(rt, 16);
+        seedEnemies(rt, 12);
         rt.mode = "play";
       }
     } else if (rt.mode === "victory") {
