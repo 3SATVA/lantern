@@ -237,6 +237,7 @@ export interface SaveData {
   y: number;
   restored: boolean[];
   unlocked: boolean[];
+  wardens: boolean[];
   seenIntro: boolean;
   visited: boolean[];
 }

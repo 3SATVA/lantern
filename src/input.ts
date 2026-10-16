@@ -36,7 +36,7 @@ export function createInput(canvas: HTMLCanvasElement): Input {
   };
 
   const setKey = (e: KeyboardEvent, down: boolean) => {
-    const k = e.key.length === 1 ? e.key.toLowerCase() : e.key;
+    const k = e.key.toLowerCase();
     if (down) {
       if (!input.keys.has(k)) input.justPressed.add(k);
       input.keys.add(k);
