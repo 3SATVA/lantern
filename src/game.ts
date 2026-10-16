@@ -277,8 +277,8 @@ function updatePlay(rt: Runtime, dt: number): void {
     rt.spawnTimer -= dt;
     const alive = rt.enemies.length;
     const nearby = rt.enemies.filter((e) => Math.hypot(e.x - p.x, e.y - p.y) < 760).length;
-    if (alive < SPAWN_CAP && nearby < 10 && rt.spawnTimer <= 0) {
-      if (trySpawn(rt)) rt.spawnTimer = 1.1;
+    if (alive < SPAWN_CAP && nearby < 6 && rt.spawnTimer <= 0) {
+      if (trySpawn(rt)) rt.spawnTimer = 1.8;
       else rt.spawnTimer = 0.35;
     }
   }

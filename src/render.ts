@@ -168,8 +168,9 @@ function drawPointer(ctx: CanvasRenderingContext2D, rt: Runtime): void {
     return;
   }
   const ang = Math.atan2(sy - rt.viewH / 2, sx - rt.viewW / 2);
-  const ex = Math.max(70, Math.min(rt.viewW - 70, rt.viewW / 2 + Math.cos(ang) * (rt.viewW / 2 - 64)));
-  const ey = Math.max(90, Math.min(rt.viewH - 80, rt.viewH / 2 + Math.sin(ang) * (rt.viewH / 2 - 64)));
+  let ex = Math.max(70, Math.min(rt.viewW - 70, rt.viewW / 2 + Math.cos(ang) * (rt.viewW / 2 - 64)));
+  let ey = Math.max(100, Math.min(rt.viewH - 80, rt.viewH / 2 + Math.sin(ang) * (rt.viewH / 2 - 64)));
+  if (ex > rt.viewW - 190 && ey < 200) ey = 210;
   ctx.fillStyle = "rgba(12,8,10,0.85)";
   ctx.fillRect(ex - 28, ey - 18, 56, 36);
   ctx.fillStyle = "#ffe566";

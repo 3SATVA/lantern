@@ -80,7 +80,7 @@ function updatePyre(rt: Runtime, b: Enemy, dt: number): void {
   } else if (mind.pattern === "slam") {
     b.vx = 0;
     if (mind.cast === 0 && mind.timer <= 0.45) {
-      volley(rt, b.x, b.y, 14, 110, 9, b.accent, rt.time);
+      volley(rt, b.x, b.y, 14, 110, 7, b.accent, rt.time);
       burst(rt, b.x, b.y, b.color, 16, 90);
       rt.shake = 6;
       mind.cast = 1;
@@ -90,7 +90,7 @@ function updatePyre(rt: Runtime, b: Enemy, dt: number): void {
     mind.data[2] -= dt;
     if (mind.data[2] <= 0) {
       mind.data[3] += 0.35;
-      volley(rt, b.x, b.y, 8, 130, 8, b.color, mind.data[3], 1.3);
+      volley(rt, b.x, b.y, 8, 120, 6, b.color, mind.data[3], 1.3);
       mind.data[2] = 0.38;
       mind.cast += 1;
     }

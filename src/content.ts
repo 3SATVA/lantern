@@ -150,9 +150,9 @@ export const DIMENSIONS: DimensionDef[] = [
     enemies: {
       basic: {
         name: "Ember Sprite",
-        hp: 16,
-        damage: 8,
-        speed: 62,
+        hp: 14,
+        damage: 5,
+        speed: 54,
         gold: 2,
         radius: 7,
         projSpeed: 0,
@@ -174,7 +174,7 @@ export const DIMENSIONS: DimensionDef[] = [
         name: "Ash Fox",
         hp: 11,
         damage: 6,
-        speed: 112,
+        speed: 86,
         gold: 3,
         radius: 7,
         projSpeed: 0,
@@ -196,7 +196,7 @@ export const DIMENSIONS: DimensionDef[] = [
     boss: {
       name: "Pyreheart",
       title: "Warden of the First Core",
-      hp: 280,
+      hp: 460,
       color: "#ff5a1f",
       accent: "#ffe066",
     },
@@ -498,7 +498,7 @@ export function statBlock(upgrades: Record<string, number>) {
     damage: 1 + 0.15 * d,
     fire: 1 + 0.12 * r,
     maxHp: 100 + 20 * h,
-    speed: 118 * (1 + 0.08 * s),
+    speed: 142 * (1 + 0.08 * s),
     range: 1 + 0.15 * g,
     maxMana: 100 + 20 * m,
   };

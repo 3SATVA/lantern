@@ -25,7 +25,7 @@ export function makeEnemy(rt: Runtime, kind: Enemy["kind"], x: number, y: number
       vy: 0,
       hp: b.hp,
       maxHp: b.hp,
-      damage: 14,
+      damage: 10,
       speed: 46,
       gold: 20,
       radius: 18,
@@ -88,7 +88,7 @@ export function trySpawn(rt: Runtime, forced?: EnemyKind): boolean {
   const rng = mulberry32((Math.random() * 1e9) | 0);
   for (let i = 0; i < 12; i++) {
     const ang = rng() * Math.PI * 2;
-    const dist = 340 + rng() * 420;
+    const dist = 460 + rng() * 380;
     const x = rt.player.x + Math.cos(ang) * dist;
     const y = rt.player.y + Math.sin(ang) * dist;
     if (x < 32 || y < 32 || x > rt.world.w * TILE - 32 || y > rt.world.h * TILE - 32) continue;
@@ -154,7 +154,7 @@ export function updateEnemies(rt: Runtime, dt: number): void {
     e.attackCd = Math.max(0, e.attackCd - dt);
     if (e.stun > 0) e.stun = Math.max(0, e.stun - dt);
     const dist = Math.hypot(p.x - e.x, p.y - e.y);
-    const wander = e.kind !== "pod" && e.kind !== "clone" && dist > 400;
+    const wander = e.kind !== "pod" && e.kind !== "clone" && dist > 280;
     if (wander) {
       if (Math.hypot(e.vx, e.vy) < 8) {
         const a = e.anim * 1.3 + e.id;
@@ -218,7 +218,19 @@ export function updateEnemies(rt: Runtime, dt: number): void {
     e.y = moved.y;
     if (dist < e.radius + p.radius && e.touchCd <= 0 && e.kind !== "ranged") {
       damagePlayer(rt, e.damage, e.name);
-      e.touchCd = 0.7;
+      e.touchCd = 1.15;
+      const push = dist || 1;
+      const bounced = moveBody(
+        rt.world,
+        p.x,
+        p.y,
+        p.radius,
+        ((p.x - e.x) / push) * 28,
+        ((p.y - e.y) / push) * 28,
+        null,
+      );
+      p.x = bounced.x;
+      p.y = bounced.y;
     }
   }
   for (let i = 0; i < rt.enemies.length; i++) {

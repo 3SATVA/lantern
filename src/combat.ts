@@ -60,7 +60,7 @@ export function damagePlayer(rt: Runtime, amount: number, cause: string): void {
   const p = rt.player;
   if (p.hurt > 0 || rt.guard > 0 || rt.mode !== "play") return;
   p.hp -= amount;
-  p.hurt = 0.7;
+  p.hurt = 1.05;
   rt.shake = Math.min(9, 2 + amount * 0.25);
   rt.audio.sfx("hurt");
   floater(rt, p.x, p.y - 16, String(Math.round(amount)), "#ff8fa3");
@@ -79,7 +79,7 @@ export function spawnProjectile(rt: Runtime, partial: Omit<Projectile, "id" | "h
 }
 
 function boltDamage(rt: Runtime): number {
-  return 11 * statsOf(rt).damage;
+  return 18 * statsOf(rt).damage;
 }
 
 export function castCurrent(rt: Runtime): void {
@@ -111,7 +111,7 @@ export function castSpell(rt: Runtime, id: SpellId): void {
       delay: 0,
       friendly: true,
       pierce: 1,
-      homing: 0,
+      homing: 2.2,
       color: rt.world.def.palette.glow,
       kind: "bolt",
       slow: 0,
