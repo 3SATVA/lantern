@@ -103,7 +103,7 @@ function refreshObjective(rt: Runtime): void {
       y: marker.y,
       title: "Follow the gold road",
       detail: `${paces} to the next lantern`,
-      side: rt.met[rt.dim] ? "" : "Merchant on the road",
+      side: "East, then north",
       tag: "ROAD",
     };
     return;

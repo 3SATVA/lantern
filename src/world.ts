@@ -151,18 +151,14 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
   const doorX = arenaX + Math.floor(arenaW / 2);
   const doorY = arenaY + arenaH - 1;
 
-  const shopTx = 50;
-  const shopTy = 54;
+  const shopTx = spawnTx + 28;
+  const shopTy = spawnTy;
   const coreTxEarly = arenaX + Math.floor(arenaW / 2);
   const coreTyEarly = arenaY + 6;
 
   const waypoints: [number, number][] = [
     [spawnTx, spawnTy],
-    [spawnTx + 16, spawnTy - 4],
-    [38, 64],
-    [shopTx, shopTy],
-    [70, 40],
-    [doorX - 6, doorY + 8],
+    [doorX, spawnTy],
     [doorX, doorY + 2],
     [doorX, doorY],
     [coreTxEarly, coreTyEarly],
