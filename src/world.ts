@@ -19,6 +19,21 @@ function setDisk(tiles: Uint8Array, cx: number, cy: number, r: number, tile: Til
   }
 }
 
+function densify(points: [number, number][], maxStep: number): [number, number][] {
+  const out: [number, number][] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    const steps = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / maxStep));
+    for (let s = 0; s < steps; s++) {
+      const t = s / steps;
+      out.push([Math.round(a[0] + (b[0] - a[0]) * t), Math.round(a[1] + (b[1] - a[1]) * t)]);
+    }
+  }
+  out.push(points[points.length - 1]);
+  return out;
+}
+
 function carveLine(tiles: Uint8Array, x0: number, y0: number, x1: number, y1: number, r: number): void {
   const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
   for (let i = 0; i <= steps; i++) {
@@ -152,11 +167,12 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
     [doorX, doorY],
     [coreTxEarly, coreTyEarly],
   ];
-  for (let i = 0; i < waypoints.length - 1; i++) {
-    carveLine(tiles, waypoints[i][0], waypoints[i][1], waypoints[i + 1][0], waypoints[i + 1][1], 3);
-  }
   setDisk(tiles, spawnTx, spawnTy, 8, Tile.Floor);
   setDisk(tiles, shopTx, shopTy, 4, Tile.Floor);
+  const road = densify(waypoints, 10);
+  for (let i = 0; i < road.length - 1; i++) {
+    carveLine(tiles, road[i][0], road[i][1], road[i + 1][0], road[i + 1][1], 3);
+  }
 
   for (let y = arenaY; y < arenaY + arenaH; y++) {
     for (let x = arenaX; x < arenaX + arenaW; x++) {
@@ -234,7 +250,7 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
     },
     landmarks,
     hazards,
-    route: waypoints.map(([x, y]) => ({ x: x * TILE + TILE / 2, y: y * TILE + TILE / 2 })),
+    route: road.map(([x, y]) => ({ x: x * TILE + TILE / 2, y: y * TILE + TILE / 2 })),
     restored,
   };
 }

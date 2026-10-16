@@ -7,7 +7,7 @@ import { AudioBus } from "./audio";
 import { deadButtons, drawFrame, pauseButtons, shopRowAt, titleButtons, travelButtons, victoryButtons } from "./render";
 import { blankProgress, loadSave, writeSave } from "./save";
 import { burst, enterDimension, freshRuntime, toast, type Runtime } from "./state";
-import type { SaveData, SpellId } from "./types";
+import { TILE, Tile, type SaveData, type SpellId } from "./types";
 import { hit, touchButtons } from "./ui";
 import { hazardUnder, moveBody, nearestHazard } from "./world";
 
@@ -229,6 +229,8 @@ function updatePlay(rt: Runtime, dt: number): void {
   p.mana = Math.min(p.maxMana, p.mana + 16 * dt);
   p.hurt = Math.max(0, p.hurt - dt);
   rt.guard = Math.max(0, rt.guard - dt);
+  const under = rt.world.tiles[Math.floor(p.y / TILE) * rt.world.w + Math.floor(p.x / TILE)];
+  if (!rt.bossLock && under === Tile.Path) p.hp = Math.min(p.maxHp, p.hp + 16 * dt);
   p.slow = Math.max(0, p.slow - dt);
   if (p.poison > 0) {
     p.poison -= dt;

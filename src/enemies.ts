@@ -76,7 +76,7 @@ function occupied(rt: Runtime, x: number, y: number, minDist = 280): boolean {
   const tx = Math.floor(x / TILE);
   const ty = Math.floor(y / TILE);
   const tile = tileAt(rt.world, tx, ty);
-  if (tile === Tile.Wall || tile === Tile.Block || tile === Tile.Door || tile === Tile.Hazard || tile === Tile.Arena) {
+  if (tile === Tile.Wall || tile === Tile.Block || tile === Tile.Door || tile === Tile.Hazard || tile === Tile.Arena || tile === Tile.Path) {
     return true;
   }
   const a = rt.world.arena;
