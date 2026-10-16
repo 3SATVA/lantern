@@ -158,6 +158,10 @@ export function drawTile(ctx: CanvasRenderingContext2D, world: World, tx: number
   const floor = n % 3 === 0 ? p.floorAlt : p.floor;
   ctx.fillStyle = tile === Tile.Path ? p.path : tile === Tile.Arena ? p.arena : floor;
   ctx.fillRect(px, py, TILE, TILE);
+  if (tile === Tile.Path) {
+    ctx.fillStyle = "#ffe08a";
+    ctx.fillRect(px + 6, py + 6, 4, 4);
+  }
   if (tile === Tile.Hazard) {
     ctx.fillStyle = p.hazard;
     ctx.fillRect(px, py, TILE, TILE);

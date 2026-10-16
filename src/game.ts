@@ -70,6 +70,20 @@ function newGame(rt: Runtime): void {
   rt.mode = "intro";
 }
 
+function nextMarker(rt: Runtime): { x: number; y: number } {
+  const route = rt.world.route;
+  let nearest = 0;
+  let best = Infinity;
+  for (let i = 0; i < route.length; i++) {
+    const d = Math.hypot(rt.player.x - route[i].x, rt.player.y - route[i].y);
+    if (d < best) {
+      best = d;
+      nearest = i;
+    }
+  }
+  return route[Math.min(route.length - 1, nearest + 1)];
+}
+
 function refreshObjective(rt: Runtime): void {
   const w = rt.world;
   const boss = rt.enemies.find((e) => e.kind === "boss");
@@ -82,14 +96,15 @@ function refreshObjective(rt: Runtime): void {
     return;
   }
   if (!rt.restored[rt.dim]) {
-    const paces = Math.max(0, Math.round(Math.hypot(w.coreX - rt.player.x, w.coreY - rt.player.y) / 16));
+    const marker = nextMarker(rt);
+    const paces = Math.max(0, Math.round(Math.hypot(marker.x - rt.player.x, marker.y - rt.player.y) / 16));
     rt.objective = {
-      x: w.coreX,
-      y: w.coreY,
-      title: "Find the core",
-      detail: `${paces} paces`,
+      x: marker.x,
+      y: marker.y,
+      title: "Follow the gold road",
+      detail: `${paces} to the next lantern`,
       side: rt.met[rt.dim] ? "" : "Merchant on the road",
-      tag: "CORE",
+      tag: "ROAD",
     };
     return;
   }

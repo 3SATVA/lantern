@@ -74,6 +74,22 @@ function drawWorld(ctx: CanvasRenderingContext2D, rt: Runtime): void {
   for (let ty = y0; ty <= y1; ty++) {
     for (let tx = x0; tx <= x1; tx++) drawTile(ctx, rt.world, tx, ty, tx * TILE, ty * TILE);
   }
+  for (const point of rt.world.route) {
+    ctx.fillStyle = "#5a3418";
+    ctx.fillRect(point.x - 2, point.y - 8, 4, 12);
+    ctx.fillStyle = "#ffe08a";
+    ctx.fillRect(point.x - 3, point.y - 12, 6, 4);
+  }
+  if (rt.objective.tag === "ROAD") {
+    const steps = Math.max(1, Math.hypot(rt.objective.x - rt.player.x, rt.objective.y - rt.player.y) / 16);
+    for (let i = 1; i < steps; i += 1) {
+      const t = i / steps;
+      const x = rt.player.x + (rt.objective.x - rt.player.x) * t;
+      const y = rt.player.y + (rt.objective.y - rt.player.y) * t;
+      ctx.fillStyle = i % 2 === 0 ? "#ffe08a" : "#fff6d0";
+      ctx.fillRect(Math.round(x) - 1, Math.round(y) - 1, 3, 3);
+    }
+  }
   drawMerchant(ctx, rt.world.shopX, rt.world.shopY, pal, rt.time);
   drawCore(ctx, rt.world.coreX, rt.world.coreY, pal, rt.world.restored, rt.time);
   for (const c of rt.pickups) drawPickup(ctx, c.x, c.y, rt.time);

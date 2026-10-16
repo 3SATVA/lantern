@@ -223,6 +223,7 @@ export interface World {
   arena: { x: number; y: number; w: number; h: number; doorX: number; doorY: number };
   landmarks: Landmark[];
   hazards: HazardSpot[];
+  route: { x: number; y: number }[];
   restored: boolean;
 }
 

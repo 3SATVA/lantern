@@ -136,20 +136,24 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
   const doorX = arenaX + Math.floor(arenaW / 2);
   const doorY = arenaY + arenaH - 1;
 
-  const shopTx = Math.floor(MAP_W * 0.42);
-  const shopTy = Math.floor(MAP_H * 0.55);
+  const shopTx = 50;
+  const shopTy = 54;
+  const coreTxEarly = arenaX + Math.floor(arenaW / 2);
+  const coreTyEarly = arenaY + 6;
 
   const waypoints: [number, number][] = [
     [spawnTx, spawnTy],
-    [20, MAP_H - 24],
-    [irand(rng, 28, 48), irand(rng, 40, 62)],
+    [spawnTx + 16, spawnTy - 4],
+    [38, 64],
     [shopTx, shopTy],
-    [irand(rng, 60, 84), irand(rng, 28, 48)],
-    [doorX, doorY + 3],
+    [70, 40],
+    [doorX - 6, doorY + 8],
+    [doorX, doorY + 2],
     [doorX, doorY],
+    [coreTxEarly, coreTyEarly],
   ];
   for (let i = 0; i < waypoints.length - 1; i++) {
-    carveLine(tiles, waypoints[i][0], waypoints[i][1], waypoints[i + 1][0], waypoints[i + 1][1], 2);
+    carveLine(tiles, waypoints[i][0], waypoints[i][1], waypoints[i + 1][0], waypoints[i + 1][1], 3);
   }
   setDisk(tiles, spawnTx, spawnTy, 8, Tile.Floor);
   setDisk(tiles, shopTx, shopTy, 4, Tile.Floor);
@@ -230,6 +234,7 @@ export function generateWorld(dimIndex: number, restored: boolean): World {
     },
     landmarks,
     hazards,
+    route: waypoints.map(([x, y]) => ({ x: x * TILE + TILE / 2, y: y * TILE + TILE / 2 })),
     restored,
   };
 }
