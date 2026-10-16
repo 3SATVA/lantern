@@ -196,7 +196,7 @@ export const DIMENSIONS: DimensionDef[] = [
     boss: {
       name: "Pyreheart",
       title: "Warden of the First Core",
-      hp: 460,
+      hp: 320,
       color: "#ff5a1f",
       accent: "#ffe066",
     },
